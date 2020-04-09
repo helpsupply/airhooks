@@ -13,8 +13,11 @@
     "node": "8"
   },
   "dependencies": {
-    "firebase-admin": "^8.6.0",
-    "firebase-functions": "^3.3.0"
+    "airtable": "^0.8.1",
+    "deep-equal": "^2.0.2",
+    "firebase-admin": "^8.10.0",
+    "firebase-functions": "^3.3.0",
+    "node-fetch": "^2.6.0"
   },
   "devDependencies": {
     "eslint": "^5.12.0",
