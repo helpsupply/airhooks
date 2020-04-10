@@ -65,4 +65,7 @@ output.text(JSON.stringify({
 
 You can use something like https://ngrok.com/ to expose a dummy webhook to the internet. I've included `dummy_server.js` in the functions directory, you can run with `node dummy_server.js` that just prints all payloads.
 
+**Performance**
+
+This tool takes advantage of the fact that Airtable bases are small (max 50k rows, 2k rows for the free edition). Because Airtable exposes no change history, we just pull the whole table and diff it against the last seen revision for each webhook (and we cache the last seen revision per webhook once we've successfully delivered it). Further, because Airtable has proper row IDs we can use a dictionary based lookup for comparison resulting in a runtime of `O(number of rows * number of columns)`.
 
