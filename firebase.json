@@ -8,6 +8,9 @@
   "emulators": {
     "functions": {
       "port": 5001
+    },
+    "pubsub": {
+      "port": 8085
     }
   },
   "storage": {

@@ -16,4 +16,15 @@ A Firebase Function runs at a fixed interval (i.e. once a minute) and compares t
 
 **Deployment**
 
-To be written!
+1. Clone this repository
+2. Install the firebase tools (`npm install -g firebase-tools`)
+3. Initialize this project to a new project (`firebase init`, configure with Functions, Pubsub and Storage).
+4. Clone the config Airtable Base: https://airtable.com/shrOZoREOcb5ERv1Q
+5. Get your Airtable API key from https://airtable.com/account and the Base ID from https://airtable.com/api
+6. Configure firebase with the above: `firebase functions:config:set airtable.key="XXXX" airtable.base="XXXX"`
+7. Deploy with `firebase deploy`
+
+**Tips**
+
+You can use something like https://ngrok.com/ to expose a dummy webhook to the internet. I've included `dummy_server.js` in the functions directory, you can run with `node dummy_server.js` that just prints all payloads.
+ 
