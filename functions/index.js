@@ -135,11 +135,60 @@ exports.scheduledProcessing = functions.pubsub.schedule('every 1 minutes').onRun
 });
 
 // This is called by consumers/publishers to publish something
-exports.hook = functions.https.onRequest((request, response) => {
-  response.send("Hello from Firebase!");
+exports.hook = functions.https.onRequest(async (request, response) => {
+  if (request.get('content-type') !== 'application/json') {
+    response.status(400).send("{'error': 'content_type_header_not_json'}");
+    return;
+  }
+
+  // Get the hook name from the URL
+  let hookName = request.path.slice(1);
+ 
+  // Pull all the hooks from airtable
+  // (We may need to cache this, lest we hit Airtable's 5rps limit)
+  let hookQuery = (await Airtable.base(AIRTABLE_CONFIG_BASE).table('Hooks').select());
+  let hooks = (await hookQuery.all()).map((h) => Object.assign(h.fields, {id: h.id}));
+  
+  // Find the matching hook
+  let target = {}
+  hooks.map((h) => {
+    if (h['Hook Name'] === hookName) {
+      target.table = h['Table'];
+      target.base = h['Base'];
+      target.token = h['Webhook Auth Token'];
+    }
+  });
+
+  if (!target.base || !target.table) {
+    response.status(404).send("{'error': 'not_found'}");
+    return;
+  }
+
+  // Check auth
+  if (request.get('x-auth-token') !== target.token) {
+    response.status(401).send("{'error': 'bad_auth'}");
+    return;
+  }
+
+  // Post the hook
+  try {
+    let result = await Airtable.base(target.base).table(target.table).create(request.body);
+    response.send(JSON.stringify({
+      created: [result.id]
+    }));
+  } catch(e) {
+    response.status(400).send(JSON.stringify({
+      error: 'bad format'
+    }));
+  }
 });
 
 // This is called by consumers/publishers to reset their state (and get a full copy of everything next update)
 exports.reset = functions.https.onRequest((request, response) => {
+  response.send("Hello from Firebase!");
+});
+
+// This is called by consumers/publishers to reset their state (and get a full copy of everything next update)
+exports.describe = functions.https.onRequest((request, response) => {
   response.send("Hello from Firebase!");
 });
