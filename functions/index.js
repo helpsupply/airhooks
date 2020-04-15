@@ -135,6 +135,8 @@ exports.scheduledProcessing = functions.pubsub.schedule('every 1 minutes').onRun
 });
 
 // This is called by consumers/publishers to publish something
+// Think about making a batch version of this... handling errors is tricky since there
+// are no transactions though.
 exports.hook = functions.https.onRequest(async (request, response) => {
   if (request.get('content-type') !== 'application/json') {
     response.status(400).send("{'error': 'content_type_header_not_json'}");
