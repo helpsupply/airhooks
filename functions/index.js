@@ -130,9 +130,12 @@ exports.processHooks = functions.https.onRequest(async (request, response) => {
   response.send("OK");
 });
 
+/*
+ * Disabled until caching is hash-based
 exports.scheduledProcessing = functions.pubsub.schedule('every 1 minutes').onRun(async (context) => {
   await checkForUpdates();
 });
+*/
 
 // This is called by consumers/publishers to publish something
 // Think about making a batch version of this... handling errors is tricky since there
@@ -161,13 +164,15 @@ exports.hook = functions.https.onRequest(async (request, response) => {
     }
   });
 
+  console.log("Sending to", target);
+
   if (!target.base || !target.table) {
     response.status(404).send("{'error': 'not_found'}");
     return;
   }
 
   // Check auth
-  if (request.get('x-auth-token') !== target.token) {
+  if (request.get('x-auth-token') !== target.token && request.query.token !== target.token) {
     response.status(401).send("{'error': 'bad_auth'}");
     return;
   }
@@ -179,8 +184,9 @@ exports.hook = functions.https.onRequest(async (request, response) => {
       created: [result.id]
     }));
   } catch(e) {
+    console.log(e);
     response.status(400).send(JSON.stringify({
-      error: 'bad format'
+      error: 'bad format',
     }));
   }
 });

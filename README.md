@@ -14,12 +14,13 @@ Airtable is great for standing up small-scale database needs, but provides no tr
 
 ## How it works
 
-A Firebase Function runs at a fixed interval (i.e. once a minute) and compares the current Airtable state to the previous state (which is has cached). Any changes are pushed to a webhook as configured in a master Airtable base.
+A Firebase Function runs at a fixed interval (i.e. once a minute) and compares the current Airtable state to the previous state (which it will hold a hash of for comparison purposes rather than the raw data). Any changes that match a particular pattern are pushed to a webhook as configured in a master Airtable base.
 
 The config airtable base has the following fields:
 - Name: Human readable identifier/name
 - Hook Name: identifier used in Webhook url's
 - Callback URL: webhook to post changes to
+- Callback Pattern: Regular expression to match in a potential update
 - Status: current status of the webhook (as reported by AirHooks, don't modify this)
 - Base: Airtable Base ID (from https://airtable.com/api).
 - Table: Table name to monitor/edit
